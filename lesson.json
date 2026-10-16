@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "id": "sat-engineer-c-memory-strings",
+  "revision": "v1.0.0",
+  "title": "C · 메모리 할당과 문자열 주소를 연결해요",
+  "description": "수정된 참고 자료의 응용을 연습해요. 필수 5문제와 선택 도전 1문제예요.",
+  "sources": [
+    "https://en.cppreference.com/w/c/language/pointer.html",
+    "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf",
+    "https://app.notion.com/p/C-3b02c8c8809e80a8a877cfeb2bbdf940"
+  ],
+  "sections": [
+    {
+      "id": "how",
+      "title": "예상하고, 실행하고, 한 줄만 바꿔요",
+      "body": "실행하기 전에 결과를 먼저 예상해요.\n틀린 이유는 변수 칸이나 자료의 행에서 찾아요.\n준비 코드를 조금 바꾸고 결과를 비교해요.\n마지막 선택 도전은 힌트 없이 먼저 풀어봐요."
+    },
+    {
+      "id": "memory",
+      "title": "화살표를 그리는 순서",
+      "body": "a와 b의 값 칸을 먼저 그려요.\np는 어느 값 칸의 주소인지 연결해요.\npp는 p 칸의 주소를 연결해요.\n별 하나마다 화살표를 한 번 따라가요.\n대입 왼쪽이 어떤 칸인지 표시한 뒤 계산해요."
+    }
+  ],
+  "review_enabled": false,
+  "tasks": [
+    {
+      "id": "heap",
+      "title": "배열 공간을 만들고 돌려줘요",
+      "goal": "malloc은 요청한 크기의 공간 주소를 돌려줘요.\n\nNULL 대신 n개의 int 공간을 할당하세요.\n준비된 실패 검사와 free는 그대로 둬요.",
+      "language": "c",
+      "entry_file": "main.c",
+      "starter_code": "#include <stdio.h>\n#include <stdlib.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int n = a % 3 + 2;\n    // 공간이 없으면 읽지 않고 끝내요.\n    int *data = NULL;\n    if (data == NULL) { puts(\"empty\"); return 0; }\n    // 할당한 범위 안에서만 값을 써요.\n    for (int i = 0; i < n; i++) data[i] = a + i;\n    printf(\"%d %d\\n\", data[0], data[n - 1]);\n    // 사용이 끝난 공간을 돌려줘요.\n    free(data);\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\n#include <stdlib.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int n = a % 3 + 2;\n    // 공간이 없으면 읽지 않고 끝내요.\n    int *data = malloc(n * sizeof *data);\n    if (data == NULL) { puts(\"empty\"); return 0; }\n    // 할당한 범위 안에서만 값을 써요.\n    for (int i = 0; i < n; i++) data[i] = a + i;\n    printf(\"%d %d\\n\", data[0], data[n - 1]);\n    // 사용이 끝난 공간을 돌려줘요.\n    free(data);\n    return 0;\n}\n",
+      "files": {},
+      "tests": [
+        {
+          "input": "3 8\n",
+          "expected": "3 4"
+        },
+        {
+          "input": "7 12\n",
+          "expected": "7 9"
+        },
+        {
+          "input": "11 4\n",
+          "expected": "11 14"
+        }
+      ],
+      "web_checks": [],
+      "git_checks": null,
+      "required": true,
+      "hints": [
+        "변수 칸과 그 칸을 가리키는 화살표를 그려 보세요.",
+        "int *data = malloc(n * sizeof *data);"
+      ],
+      "narration": [
+        {
+          "action": "set_code",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int n = a % 3 + 2;\n    // 공간이 없으면 읽지 않고 끝내요.\n    int *data = NULL;\n    if (data == NULL) { puts(\"empty\"); return 0; }\n    // 할당한 범위 안에서만 값을 써요.\n    for (int i = 0; i < n; i++) data[i] = a + i;\n    printf(\"%d %d\\n\", data[0], data[n - 1]);\n    // 사용이 끝난 공간을 돌려줘요.\n    free(data);\n    return 0;\n}\n",
+          "say": "먼저 값을 예상하고 실행해 볼게요."
+        },
+        {
+          "action": "run",
+          "expected_failure": false
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. empty"
+        },
+        {
+          "action": "say",
+          "target": "editor",
+          "text": "조심하세요. 할당에 실패한 NULL을 역참조하면 안 돼요."
+        },
+        {
+          "action": "patch_code",
+          "before": "int *data = NULL;",
+          "after": "int *data = malloc(n * sizeof *data);",
+          "say": "대상 칸을 확인하고 작은 부분만 바꿔요."
+        },
+        {
+          "action": "run"
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. 3 4"
+        },
+        {
+          "action": "submit"
+        }
+      ]
+    },
+    {
+      "id": "output-allocation",
+      "title": "함수에서 만든 공간의 주소를 받아요",
+      "goal": "포인터의 주소를 넘기면 새 공간 주소를 받을 수 있어요.\n\n함수의 *out에 새 공간의 주소를 저장하세요.\n함수의 지역 포인터만 바꾸면 전달되지 않아요.",
+      "language": "c",
+      "entry_file": "main.c",
+      "starter_code": "#include <stdio.h>\n#include <stdlib.h>\nvoid build(int **out, int n, int start) {\n    // 호출자의 포인터 칸에 주소를 돌려줘요.\n    *out = NULL;\n    if (*out == NULL) return;\n    // *out을 먼저 읽은 뒤 배열의 칸을 골라요.\n    for (int i = 0; i < n; i++) (*out)[i] = start + i;\n}\n\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int n = a % 3 + 2;\n    int *data = NULL;\n    // 함수가 data 칸에 공간 주소를 써요.\n    build(&data, n, b);\n    if (data == NULL) { puts(\"empty\"); return 0; }\n    printf(\"%d %d\\n\", data[0], data[n - 1]);\n    // 호출자가 받은 공간을 정리해요.\n    free(data);\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\n#include <stdlib.h>\nvoid build(int **out, int n, int start) {\n    // 호출자의 포인터 칸에 주소를 돌려줘요.\n    *out = malloc(n * sizeof **out);\n    if (*out == NULL) return;\n    // *out을 먼저 읽은 뒤 배열의 칸을 골라요.\n    for (int i = 0; i < n; i++) (*out)[i] = start + i;\n}\n\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int n = a % 3 + 2;\n    int *data = NULL;\n    // 함수가 data 칸에 공간 주소를 써요.\n    build(&data, n, b);\n    if (data == NULL) { puts(\"empty\"); return 0; }\n    printf(\"%d %d\\n\", data[0], data[n - 1]);\n    // 호출자가 받은 공간을 정리해요.\n    free(data);\n    return 0;\n}\n",
+      "files": {},
+      "tests": [
+        {
+          "input": "3 8\n",
+          "expected": "8 9"
+        },
+        {
+          "input": "7 12\n",
+          "expected": "12 14"
+        },
+        {
+          "input": "11 4\n",
+          "expected": "4 7"
+        }
+      ],
+      "web_checks": [],
+      "git_checks": null,
+      "required": true,
+      "hints": [
+        "변수 칸과 그 칸을 가리키는 화살표를 그려 보세요.",
+        "*out = malloc(n * sizeof **out);"
+      ],
+      "narration": [
+        {
+          "action": "set_code",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\nvoid build(int **out, int n, int start) {\n    // 호출자의 포인터 칸에 주소를 돌려줘요.\n    *out = NULL;\n    if (*out == NULL) return;\n    // *out을 먼저 읽은 뒤 배열의 칸을 골라요.\n    for (int i = 0; i < n; i++) (*out)[i] = start + i;\n}\n\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int n = a % 3 + 2;\n    int *data = NULL;\n    // 함수가 data 칸에 공간 주소를 써요.\n    build(&data, n, b);\n    if (data == NULL) { puts(\"empty\"); return 0; }\n    printf(\"%d %d\\n\", data[0], data[n - 1]);\n    // 호출자가 받은 공간을 정리해요.\n    free(data);\n    return 0;\n}\n",
+          "say": "먼저 값을 예상하고 실행해 볼게요."
+        },
+        {
+          "action": "run",
+          "expected_failure": false
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. empty"
+        },
+        {
+          "action": "say",
+          "target": "editor",
+          "text": "조심하세요. 지역 변수의 주소를 돌려주면 수명이 끝난 칸을 가리켜요."
+        },
+        {
+          "action": "patch_code",
+          "before": "*out = NULL;",
+          "after": "*out = malloc(n * sizeof **out);",
+          "say": "대상 칸을 확인하고 작은 부분만 바꿔요."
+        },
+        {
+          "action": "run"
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. 8 9"
+        },
+        {
+          "action": "submit"
+        }
+      ]
+    },
+    {
+      "id": "parentheses",
+      "title": "괄호로 먼저 역참조해요",
+      "goal": "(*pp)[i]는 pp가 가리킨 배열의 i번 칸이에요.\n\n첫 칸을 반복해서 쓰지 말고 i번 칸을 바꾸세요.\n메모리 범위는 준비 코드 안에서 보장돼요.",
+      "language": "c",
+      "entry_file": "main.c",
+      "starter_code": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int values[3] = {a, b, a + b};\n    int *p = values;\n    int **pp = &p;\n    // 괄호 안의 *pp로 배열 시작을 먼저 얻어요.\n    for (int i = 0; i < 3; i++) (*pp)[0] = a + i;\n    printf(\"%d %d %d\\n\", values[0], values[1], values[2]);\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int values[3] = {a, b, a + b};\n    int *p = values;\n    int **pp = &p;\n    // 괄호 안의 *pp로 배열 시작을 먼저 얻어요.\n    for (int i = 0; i < 3; i++) (*pp)[i] = a + i;\n    printf(\"%d %d %d\\n\", values[0], values[1], values[2]);\n    return 0;\n}\n",
+      "files": {},
+      "tests": [
+        {
+          "input": "3 8\n",
+          "expected": "3 4 5"
+        },
+        {
+          "input": "7 12\n",
+          "expected": "7 8 9"
+        },
+        {
+          "input": "11 4\n",
+          "expected": "11 12 13"
+        }
+      ],
+      "web_checks": [],
+      "git_checks": null,
+      "required": true,
+      "hints": [
+        "변수 칸과 그 칸을 가리키는 화살표를 그려 보세요.",
+        "(*pp)[i] = a + i;"
+      ],
+      "narration": [
+        {
+          "action": "set_code",
+          "code": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    int values[3] = {a, b, a + b};\n    int *p = values;\n    int **pp = &p;\n    // 괄호 안의 *pp로 배열 시작을 먼저 얻어요.\n    for (int i = 0; i < 3; i++) (*pp)[0] = a + i;\n    printf(\"%d %d %d\\n\", values[0], values[1], values[2]);\n    return 0;\n}\n",
+          "say": "먼저 값을 예상하고 실행해 볼게요."
+        },
+        {
+          "action": "run",
+          "expected_failure": false
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. 5 8 11"
+        },
+        {
+          "action": "say",
+          "target": "editor",
+          "text": "조심하세요. *pp[i]는 pp 쪽의 배열 칸부터 읽어서 의미가 달라요."
+        },
+        {
+          "action": "patch_code",
+          "before": "(*pp)[0] = a + i;",
+          "after": "(*pp)[i] = a + i;",
+          "say": "대상 칸을 확인하고 작은 부분만 바꿔요."
+        },
+        {
+          "action": "run"
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. 3 4 5"
+        },
+        {
+          "action": "submit"
+        }
+      ]
+    },
+    {
+      "id": "strings",
+      "title": "문자열 주소 목록을 따라가요",
+      "goal": "문자열 포인터 배열의 원소에는 문자열 시작 주소가 있어요.\n\n선택한 k번 문자열을 출력하세요.\n시작 주소만 읽는 대신 k칸 이동해서 읽어요.",
+      "language": "c",
+      "entry_file": "main.c",
+      "starter_code": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    // 문자열 리터럴은 수정하지 않아요.\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    const char **pnames = names;\n    int k = (a + b) % 3;\n    // 한 번 따라가면 문자열 주소가 나와요.\n    printf(\"%s\\n\", *pnames);\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    // 문자열 리터럴은 수정하지 않아요.\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    const char **pnames = names;\n    int k = (a + b) % 3;\n    // 한 번 따라가면 문자열 주소가 나와요.\n    printf(\"%s\\n\", *(pnames + k));\n    return 0;\n}\n",
+      "files": {},
+      "tests": [
+        {
+          "input": "3 8\n",
+          "expected": "Gold"
+        },
+        {
+          "input": "7 12\n",
+          "expected": "Blue"
+        },
+        {
+          "input": "11 4\n",
+          "expected": "Red"
+        }
+      ],
+      "web_checks": [],
+      "git_checks": null,
+      "required": true,
+      "hints": [
+        "변수 칸과 그 칸을 가리키는 화살표를 그려 보세요.",
+        "printf(\"%s\\n\", *(pnames + k));"
+      ],
+      "narration": [
+        {
+          "action": "set_code",
+          "code": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    // 문자열 리터럴은 수정하지 않아요.\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    const char **pnames = names;\n    int k = (a + b) % 3;\n    // 한 번 따라가면 문자열 주소가 나와요.\n    printf(\"%s\\n\", *pnames);\n    return 0;\n}\n",
+          "say": "먼저 값을 예상하고 실행해 볼게요."
+        },
+        {
+          "action": "run",
+          "expected_failure": false
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. Red"
+        },
+        {
+          "action": "say",
+          "target": "editor",
+          "text": "조심하세요. 문자열의 첫 글자와 문자열 시작 주소는 다른 값이에요."
+        },
+        {
+          "action": "patch_code",
+          "before": "printf(\"%s\\n\", *pnames);",
+          "after": "printf(\"%s\\n\", *(pnames + k));",
+          "say": "대상 칸을 확인하고 작은 부분만 바꿔요."
+        },
+        {
+          "action": "run"
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. Gold"
+        },
+        {
+          "action": "submit"
+        }
+      ]
+    },
+    {
+      "id": "string-character",
+      "title": "문자열을 고른 뒤 글자를 골라요",
+      "goal": "pnames[k][1]은 k번 문자열의 두 번째 글자예요.\n\nk번 문자열의 두 번째 글자를 출력하세요.\n문자열 번호와 글자 번호를 구분해요.",
+      "language": "c",
+      "entry_file": "main.c",
+      "starter_code": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    const char **pnames = names;\n    // k는 자료마다 다른 문자열을 골라요.\n    int k = (a + b) % 3;\n    printf(\"%c\\n\", pnames[0][1]);\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    const char **pnames = names;\n    // k는 자료마다 다른 문자열을 골라요.\n    int k = (a + b) % 3;\n    printf(\"%c\\n\", pnames[k][1]);\n    return 0;\n}\n",
+      "files": {},
+      "tests": [
+        {
+          "input": "3 8\n",
+          "expected": "o"
+        },
+        {
+          "input": "7 12\n",
+          "expected": "l"
+        },
+        {
+          "input": "11 4\n",
+          "expected": "e"
+        }
+      ],
+      "web_checks": [],
+      "git_checks": null,
+      "required": true,
+      "hints": [
+        "변수 칸과 그 칸을 가리키는 화살표를 그려 보세요.",
+        "pnames[k][1]"
+      ],
+      "narration": [
+        {
+          "action": "set_code",
+          "code": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    const char **pnames = names;\n    // k는 자료마다 다른 문자열을 골라요.\n    int k = (a + b) % 3;\n    printf(\"%c\\n\", pnames[0][1]);\n    return 0;\n}\n",
+          "say": "먼저 값을 예상하고 실행해 볼게요."
+        },
+        {
+          "action": "run",
+          "expected_failure": false
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. e"
+        },
+        {
+          "action": "say",
+          "target": "editor",
+          "text": "조심하세요. 문자 하나를 출력할 때는 %s 대신 %c를 써요."
+        },
+        {
+          "action": "patch_code",
+          "before": "pnames[0][1]",
+          "after": "pnames[k][1]",
+          "say": "대상 칸을 확인하고 작은 부분만 바꿔요."
+        },
+        {
+          "action": "run"
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. o"
+        },
+        {
+          "action": "submit"
+        }
+      ]
+    },
+    {
+      "id": "swap-addresses",
+      "title": "도전 · 포인터 배열의 순서를 바꿔요",
+      "goal": "문자열 내용을 바꾸지 않고 주소 칸을 교환할 수 있어요.\n\n첫 주소와 k번 주소를 맞바꾸세요.\n마지막 대입이 첫 칸을 다시 덮지 않게 고쳐요.",
+      "language": "c",
+      "entry_file": "main.c",
+      "starter_code": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    int k = (a + b) % 3;\n    // 문자열은 그대로 두고 주소만 교환해요.\n    const char *saved = names[0];\n    names[0] = names[k];\n    names[0] = saved;\n    printf(\"%s %s\\n\", names[0], names[k]);\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    int k = (a + b) % 3;\n    // 문자열은 그대로 두고 주소만 교환해요.\n    const char *saved = names[0];\n    names[0] = names[k];\n    names[k] = saved;\n    printf(\"%s %s\\n\", names[0], names[k]);\n    return 0;\n}\n",
+      "files": {},
+      "tests": [
+        {
+          "input": "3 8\n",
+          "expected": "Gold Red"
+        },
+        {
+          "input": "7 12\n",
+          "expected": "Blue Red"
+        },
+        {
+          "input": "11 4\n",
+          "expected": "Red Red"
+        }
+      ],
+      "web_checks": [],
+      "git_checks": null,
+      "required": false,
+      "hints": [
+        "변수 칸과 그 칸을 가리키는 화살표를 그려 보세요.",
+        "names[k] = saved;"
+      ],
+      "narration": [
+        {
+          "action": "set_code",
+          "code": "#include <stdio.h>\nint main(void) {\n    // 입력값을 바꿔도 같은 원리로 풀어요.\n    int a, b;\n    if (scanf(\"%d %d\", &a, &b) != 2) return 1;\n    const char *names[] = {\"Red\", \"Blue\", \"Gold\"};\n    int k = (a + b) % 3;\n    // 문자열은 그대로 두고 주소만 교환해요.\n    const char *saved = names[0];\n    names[0] = names[k];\n    names[0] = saved;\n    printf(\"%s %s\\n\", names[0], names[k]);\n    return 0;\n}\n",
+          "say": "먼저 값을 예상하고 실행해 볼게요."
+        },
+        {
+          "action": "run",
+          "expected_failure": false
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. Red Gold"
+        },
+        {
+          "action": "say",
+          "target": "editor",
+          "text": "조심하세요. 문자열 리터럴에 새 글자를 쓰는 방식으로 풀면 안 돼요."
+        },
+        {
+          "action": "patch_code",
+          "before": "names[0] = saved;",
+          "after": "names[k] = saved;",
+          "say": "대상 칸을 확인하고 작은 부분만 바꿔요."
+        },
+        {
+          "action": "run"
+        },
+        {
+          "action": "say",
+          "target": "output",
+          "text": "실행 결과를 비교해요. Gold Red"
+        },
+        {
+          "action": "submit"
+        }
+      ]
+    }
+  ]
+}
